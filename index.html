@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/filter.css">
+<link rel="stylesheet" href="css/nouislider.min.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="js/tailDT.js"></script>
+<script src="js/nouislider.min.js"></script>
+<script src="js/wNumb.js"></script>
+        <script src="data/SindhUpdatedDistricts_2.js"></script>
+        <script src="data/GDtoGDdistancefacilities_3.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+            highlightLayer.openPopup();
+        }
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[24.01751437415363,65.92535223504534],[28.718046432911084,72.15504472304413]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_GoogleMaps_0');
+        map.getPane('pane_GoogleMaps_0').style.zIndex = 400;
+        var layer_GoogleMaps_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleMaps_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_GoogleMaps_0;
+        map.addLayer(layer_GoogleMaps_0);
+        map.createPane('pane_Sindhpopulationraster_1');
+        map.getPane('pane_Sindhpopulationraster_1').style.zIndex = 401;
+        var img_Sindhpopulationraster_1 = 'data/Sindhpopulationraster_1.png';
+        var img_bounds_Sindhpopulationraster_1 = [[24.008333333,66.658333333],[28.483333333,71.125]];
+        var layer_Sindhpopulationraster_1 = new L.imageOverlay(img_Sindhpopulationraster_1,
+                                              img_bounds_Sindhpopulationraster_1,
+                                              {pane: 'pane_Sindhpopulationraster_1'});
+        bounds_group.addLayer(layer_Sindhpopulationraster_1);
+        function pop_SindhUpdatedDistricts_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(feature.properties['ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['District'] !== null ? autolinker.link(feature.properties['District'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Dist_short'] !== null ? autolinker.link(feature.properties['Dist_short'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_SindhUpdatedDistricts_2_0() {
+            return {
+                pane: 'pane_SindhUpdatedDistricts_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(168,231,248,0.0)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_SindhUpdatedDistricts_2');
+        map.getPane('pane_SindhUpdatedDistricts_2').style.zIndex = 402;
+        map.getPane('pane_SindhUpdatedDistricts_2').style['mix-blend-mode'] = 'normal';
+        var layer_SindhUpdatedDistricts_2 = new L.geoJson(json_SindhUpdatedDistricts_2, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_SindhUpdatedDistricts_2',
+            layerName: 'layer_SindhUpdatedDistricts_2',
+            pane: 'pane_SindhUpdatedDistricts_2',
+            onEachFeature: pop_SindhUpdatedDistricts_2,
+            style: style_SindhUpdatedDistricts_2_0,
+        });
+        bounds_group.addLayer(layer_SindhUpdatedDistricts_2);
+        map.addLayer(layer_SindhUpdatedDistricts_2);
+        function pop_GDtoGDdistancefacilities_3(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">HF code</th>\
+                        <td>' + (feature.properties['HF code'] !== null ? autolinker.link(feature.properties['HF code'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">District</th>\
+                        <td>' + (feature.properties['District'] !== null ? autolinker.link(feature.properties['District'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">HF name</th>\
+                        <td>' + (feature.properties['HF name'] !== null ? autolinker.link(feature.properties['HF name'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">HF type</th>\
+                        <td>' + (feature.properties['HF type'] !== null ? autolinker.link(feature.properties['HF type'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Managed By</th>\
+                        <td>' + (feature.properties['Managed By'] !== null ? autolinker.link(feature.properties['Managed By'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Area Type</th>\
+                        <td>' + (feature.properties['Area Type'] !== null ? autolinker.link(feature.properties['Area Type'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">24/7</th>\
+                        <td>' + (feature.properties['24/7'] !== null ? autolinker.link(feature.properties['24/7'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Latitude</th>\
+                        <td>' + (feature.properties['Latitude'] !== null ? autolinker.link(feature.properties['Latitude'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Longitude</th>\
+                        <td>' + (feature.properties['Longitude'] !== null ? autolinker.link(feature.properties['Longitude'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Closest GD</th>\
+                        <td>' + (feature.properties['Closest GD'] !== null ? autolinker.link(feature.properties['Closest GD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Dist (km)</th>\
+                        <td>' + (feature.properties['Dist (km)'] !== null ? autolinker.link(feature.properties['Dist (km)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_GDtoGDdistancefacilities_3_0() {
+            return {
+                pane: 'pane_GDtoGDdistancefacilities_3',
+                radius: 6.0,
+                opacity: 1,
+                color: 'rgba(61,128,53,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(84,176,74,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_GDtoGDdistancefacilities_3');
+        map.getPane('pane_GDtoGDdistancefacilities_3').style.zIndex = 403;
+        map.getPane('pane_GDtoGDdistancefacilities_3').style['mix-blend-mode'] = 'normal';
+        var layer_GDtoGDdistancefacilities_3 = new L.geoJson(json_GDtoGDdistancefacilities_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_GDtoGDdistancefacilities_3',
+            layerName: 'layer_GDtoGDdistancefacilities_3',
+            pane: 'pane_GDtoGDdistancefacilities_3',
+            onEachFeature: pop_GDtoGDdistancefacilities_3,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_GDtoGDdistancefacilities_3_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_GDtoGDdistancefacilities_3);
+        map.addLayer(layer_GDtoGDdistancefacilities_3);
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'<img src="legend/GDtoGDdistancefacilities_3.png" /> GD to GD distance facilities': layer_GDtoGDdistancefacilities_3,'<img src="legend/SindhUpdatedDistricts_2.png" /> Sindh Updated Districts': layer_SindhUpdatedDistricts_2,"Sindh population raster": layer_Sindhpopulationraster_1,"Google Maps": layer_GoogleMaps_0,}).addTo(map);
+        setBounds();
+        var i = 0;
+        layer_SindhUpdatedDistricts_2.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['District'] !== null?String('<div style="color: #323232; font-size: 12pt; font-weight: bold; font-family: \'Arial\', sans-serif;">' + layer.feature.properties['District']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_SindhUpdatedDistricts_2'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        var mapDiv = document.getElementById('map');
+        var row = document.createElement('div');
+        row.className="row";
+        row.id="all";
+        row.style.height = "100%";
+        var col1 = document.createElement('div');
+        col1.className="col9";
+        col1.id = "mapWindow";
+        col1.style.height = "99%";
+        col1.style.width = "80%";
+        col1.style.display = "inline-block";
+        var col2 = document.createElement('div');
+        col2.className="col3";
+        col2.id = "menu";
+        col2.style.display = "inline-block";
+        mapDiv.parentNode.insertBefore(row, mapDiv);
+        document.getElementById("all").appendChild(col1);
+        document.getElementById("all").appendChild(col2);
+        col1.appendChild(mapDiv)
+        var Filters = {"HF type": "str","Managed By": "str","District": "str"};
+        function filterFunc() {
+          map.eachLayer(function(lyr){
+          if ("options" in lyr && "dataVar" in lyr["options"]){
+            features = this[lyr["options"]["dataVar"]].features.slice(0);
+            try{
+              for (key in Filters){
+                keyS = key.replace(/[^a-zA-Z0-9_]/g, "")
+                if (Filters[key] == "str" || Filters[key] == "bool"){
+                  var selection = [];
+                  var options = document.getElementById("sel_" + keyS).options
+                  for (var i=0; i < options.length; i++) {
+                    if (options[i].selected) selection.push(options[i].value);
+                  }
+                    try{
+                      if (key in features[0].properties){
+                        for (i = features.length - 1;
+                          i >= 0; --i){
+                          if (selection.indexOf(
+                          features[i].properties[key])<0
+                          && selection.length>0) {
+                          features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                  }
+                }
+                if (Filters[key] == "int"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (parseInt(features[i].properties[key])
+                          < sliderVals[0]
+                          || parseInt(features[i].properties[key])
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "real"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (features[i].properties[key]
+                          < sliderVals[0]
+                          || features[i].properties[key]
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "date"
+                  || Filters[key] == "datetime"
+                  || Filters[key] == "time"){
+                  try{
+                    if (key in features[0].properties){
+                      HTMLkey = key.replace(/[&\/\\#,+()$~%.'":*?<>{} ]/g, '');
+                      startdate = document.getElementById("dat_" +
+                        HTMLkey + "_date1").value.replace(" ", "T");
+                      enddate = document.getElementById("dat_" +
+                        HTMLkey + "_date2").value.replace(" ", "T");
+                      for (i = features.length - 1; i >= 0; --i){
+                        if (features[i].properties[key] < startdate
+                          || features[i].properties[key] > enddate){
+                          features.splice(i,1);
+                        }
+                      }
+                    }
+                  } catch(err){
+                  }
+                }
+              }
+            } catch(err){
+            }
+          this[lyr["options"]["layerName"]].clearLayers();
+          this[lyr["options"]["layerName"]].addData(features);
+        var i = 0;
+        layer_SindhUpdatedDistricts_2.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['District'] !== null?String('<div style="color: #323232; font-size: 12pt; font-weight: bold; font-family: \'Arial\', sans-serif;">' + layer.feature.properties['District']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_SindhUpdatedDistricts_2'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+          }
+          })
+        }
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_HFtype = document.createElement('div');
+            div_HFtype.id = "div_HFtype";
+            div_HFtype.className= "filterselect";
+            document.getElementById("menu").appendChild(div_HFtype);
+            sel_HFtype = document.createElement('select');
+            sel_HFtype.multiple = true;
+            sel_HFtype.size = 7;
+            sel_HFtype.id = "sel_HFtype";
+            var HFtype_options_str = "<option value='' unselected></option>";
+            sel_HFtype.onchange = function(){filterFunc()};
+            HFtype_options_str  += '<option value="CD">CD</option>';
+            HFtype_options_str  += '<option value="DCD">DCD</option>';
+            HFtype_options_str  += '<option value="ED">ED</option>';
+            HFtype_options_str  += '<option value="GD">GD</option>';
+            HFtype_options_str  += '<option value="GRD">GRD</option>';
+            HFtype_options_str  += '<option value="RD">RD</option>';
+            HFtype_options_str  += '<option value="UD">UD</option>';
+            sel_HFtype.innerHTML = HFtype_options_str;
+            div_HFtype.appendChild(sel_HFtype);
+            var lab_HFtype = document.createElement('div');
+            lab_HFtype.innerHTML = 'HF type';
+            lab_HFtype.className = 'filterlabel';
+            div_HFtype.appendChild(lab_HFtype);
+            var reset_HFtype = document.createElement('div');
+            reset_HFtype.innerHTML = 'clear filter';
+            reset_HFtype.className = 'filterlabel';
+            reset_HFtype.onclick = function() {
+                var options = document.getElementById("sel_HFtype").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_HFtype.appendChild(reset_HFtype);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_ManagedBy = document.createElement('div');
+            div_ManagedBy.id = "div_ManagedBy";
+            div_ManagedBy.className= "filterselect";
+            document.getElementById("menu").appendChild(div_ManagedBy);
+            sel_ManagedBy = document.createElement('select');
+            sel_ManagedBy.multiple = true;
+            sel_ManagedBy.size = 2;
+            sel_ManagedBy.id = "sel_ManagedBy";
+            var ManagedBy_options_str = "<option value='' unselected></option>";
+            sel_ManagedBy.onchange = function(){filterFunc()};
+            ManagedBy_options_str  += '<option value="DOH">DOH</option>';
+            ManagedBy_options_str  += '<option value="PPHI">PPHI</option>';
+            sel_ManagedBy.innerHTML = ManagedBy_options_str;
+            div_ManagedBy.appendChild(sel_ManagedBy);
+            var lab_ManagedBy = document.createElement('div');
+            lab_ManagedBy.innerHTML = 'Managed By';
+            lab_ManagedBy.className = 'filterlabel';
+            div_ManagedBy.appendChild(lab_ManagedBy);
+            var reset_ManagedBy = document.createElement('div');
+            reset_ManagedBy.innerHTML = 'clear filter';
+            reset_ManagedBy.className = 'filterlabel';
+            reset_ManagedBy.onclick = function() {
+                var options = document.getElementById("sel_ManagedBy").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_ManagedBy.appendChild(reset_ManagedBy);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_District = document.createElement('div');
+            div_District.id = "div_District";
+            div_District.className= "filterselect";
+            document.getElementById("menu").appendChild(div_District);
+            sel_District = document.createElement('select');
+            sel_District.multiple = true;
+            sel_District.size = 10;
+            sel_District.id = "sel_District";
+            var District_options_str = "<option value='' unselected></option>";
+            sel_District.onchange = function(){filterFunc()};
+            District_options_str  += '<option value="Badin">Badin</option>';
+            District_options_str  += '<option value="Dadu">Dadu</option>';
+            District_options_str  += '<option value="Ghotki">Ghotki</option>';
+            District_options_str  += '<option value="Hyderabad">Hyderabad</option>';
+            District_options_str  += '<option value="Jacobabad">Jacobabad</option>';
+            District_options_str  += '<option value="Jamshoro">Jamshoro</option>';
+            District_options_str  += '<option value="Kamber">Kamber</option>';
+            District_options_str  += '<option value="Karachi Central">Karachi Central</option>';
+            District_options_str  += '<option value="Karachi East">Karachi East</option>';
+            District_options_str  += '<option value="Karachi Kemari">Karachi Kemari</option>';
+            District_options_str  += '<option value="Karachi Korangi">Karachi Korangi</option>';
+            District_options_str  += '<option value="Karachi Malir">Karachi Malir</option>';
+            District_options_str  += '<option value="Karachi South">Karachi South</option>';
+            District_options_str  += '<option value="Karachi West">Karachi West</option>';
+            District_options_str  += '<option value="Kashmore">Kashmore</option>';
+            District_options_str  += '<option value="Khairpur">Khairpur</option>';
+            District_options_str  += '<option value="Larkana">Larkana</option>';
+            District_options_str  += '<option value="Matiari">Matiari</option>';
+            District_options_str  += '<option value="Mirpurkhas">Mirpurkhas</option>';
+            District_options_str  += '<option value="Naushero Feroz">Naushero Feroz</option>';
+            District_options_str  += '<option value="Sanghar">Sanghar</option>';
+            District_options_str  += '<option value="Shaheed Benazirabad">Shaheed Benazirabad</option>';
+            District_options_str  += '<option value="Shikarpur">Shikarpur</option>';
+            District_options_str  += '<option value="Sujawal">Sujawal</option>';
+            District_options_str  += '<option value="Sukkur">Sukkur</option>';
+            District_options_str  += '<option value="Tando Allahyar">Tando Allahyar</option>';
+            District_options_str  += '<option value="Tando Muhammad Khan">Tando Muhammad Khan</option>';
+            District_options_str  += '<option value="Tharparkar">Tharparkar</option>';
+            District_options_str  += '<option value="Thatta">Thatta</option>';
+            District_options_str  += '<option value="Umerkot">Umerkot</option>';
+            sel_District.innerHTML = District_options_str;
+            div_District.appendChild(sel_District);
+            var lab_District = document.createElement('div');
+            lab_District.innerHTML = 'District';
+            lab_District.className = 'filterlabel';
+            div_District.appendChild(lab_District);
+            var reset_District = document.createElement('div');
+            reset_District.innerHTML = 'clear filter';
+            reset_District.className = 'filterlabel';
+            reset_District.onclick = function() {
+                var options = document.getElementById("sel_District").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_District.appendChild(reset_District);
+        L.ImageOverlay.include({
+            getBounds: function () {
+                return this._bounds;
+            }
+        });
+        resetLabels([layer_SindhUpdatedDistricts_2]);
+        map.on("zoomend", function(){
+            resetLabels([layer_SindhUpdatedDistricts_2]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_SindhUpdatedDistricts_2]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_SindhUpdatedDistricts_2]);
+        });
+        </script>
+    </body>
+</html>
